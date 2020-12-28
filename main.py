@@ -1,11 +1,14 @@
+import time
+
 from mazesolveragent.Agent import Agent
 
 
 def main():
-
-    agent = Agent('SmallInputFile.txt')
+    start = time.time()
+    agent = Agent('LargeInputFile.txt')
     agent.solve()
-
+    end = time.time()
+    print(f'The algorithm took {end - start:.4f} seconds')
 
 
 if __name__ == '__main__':

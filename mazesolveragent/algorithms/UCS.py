@@ -32,7 +32,7 @@ class UCS(Algorithm):
         entry = UCS.Node(entryPoint)
         heapq.heappush(heap, entry)
 
-        mazeIndicator = [[sys.maxsize for i in range(mazeSize)]for j in range(mazeSize)]
+        mazeIndicator = [[sys.maxsize for _ in range(mazeSize)] for _ in range(mazeSize)]
 
         mazeIndicator[entryPoint[Constants.X]][entryPoint[Constants.Y]] = 0
 
@@ -41,7 +41,7 @@ class UCS(Algorithm):
 
             # check if reached goal
             if currentNode.coordinates == destination:
-                return currentNode
+                return currentNode.path
 
             # list of Nodes
             neighbors = self.getNeighborsNode(maze, mazeSize, currentNode)

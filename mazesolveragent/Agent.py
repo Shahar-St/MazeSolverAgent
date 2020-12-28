@@ -1,13 +1,16 @@
 import numpy as np
 
 from mazesolveragent.algorithms.AStar import AStar
+from mazesolveragent.algorithms.IDA import IDA
+from mazesolveragent.algorithms.IDAStar import IDAStar
 from mazesolveragent.algorithms.UCS import UCS
 
 
 class Agent:
-    _algorithms = {'ASTAR': AStar(),
-                   'IDASTAR': UCS(),
-                   'USC': UCS()
+    _ALGORITHMS = {'ASTAR': AStar(),
+                   'IDASTAR': IDAStar(),
+                   'UCS': UCS(),
+                   'IDA': IDA()
                    }
 
     def __init__(self, fileName):
@@ -27,7 +30,7 @@ class Agent:
 
         # maze = np.array(maze)
 
-        self._algorithm = Agent._algorithms[algorithmName]
+        self._algorithm = Agent._ALGORITHMS[algorithmName]
         self._maze = maze
         self._mazeSize = matrixSize
         self._entrypoint = entryPoint
@@ -35,4 +38,7 @@ class Agent:
 
     def solve(self):
         res = self._algorithm.solve(self._maze, self._mazeSize, self._entrypoint, self._destination)
-        print(res.path)
+        if res is not None:
+            print(res)
+        else:
+            print(None)
