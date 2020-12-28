@@ -1,4 +1,9 @@
+from abc import abstractmethod
+
+
 class Algorithm:
 
-    def solve(self):
-        pass
+
+    @abstractmethod
+    def solve(self, maze, size, entryPoint, destination):
+        raise NotImplementedError

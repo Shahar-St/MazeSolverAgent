@@ -1,15 +1,16 @@
 import numpy as np
 
 from mazesolveragent.algorithms.AStar import AStar
+from mazesolveragent.algorithms.UCS import UCS
 
 
 class Agent:
     _algorithms = {'ASTAR': AStar(),
-                   'IDASTAR': AStar()
+                   'IDASTAR': UCS(),
+                   'USC': UCS()
                    }
 
     def __init__(self, fileName):
-
 
         inputFile = open(fileName, 'r')
         algorithmName = inputFile.readline().replace('\n', '')
@@ -36,4 +37,4 @@ class Agent:
 
 
     def solve(self):
-        self._algorithm.solve()
+        self._algorithm.solve(self._maze, self._mazeSize,self._entrypoint,self._destination)
