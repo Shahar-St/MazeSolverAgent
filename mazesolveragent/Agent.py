@@ -11,7 +11,6 @@ class Agent:
                    }
 
     def __init__(self, fileName):
-
         inputFile = open(fileName, 'r')
         algorithmName = inputFile.readline().replace('\n', '')
         matrixSize = int(inputFile.readline().replace('\n', ''))
@@ -26,7 +25,7 @@ class Agent:
             strLine = ''.join([c for c in line if c not in sc])
             maze.append([int(num) for num in strLine.split(',')])
 
-        maze = np.array(maze)
+        # maze = np.array(maze)
 
         self._algorithm = Agent._algorithms[algorithmName]
         self._maze = maze
@@ -34,7 +33,6 @@ class Agent:
         self._entrypoint = entryPoint
         self._destination = destination
 
-
-
     def solve(self):
-        self._algorithm.solve(self._maze, self._mazeSize,self._entrypoint,self._destination)
+        res = self._algorithm.solve(self._maze, self._mazeSize, self._entrypoint, self._destination)
+        print(res.path)
