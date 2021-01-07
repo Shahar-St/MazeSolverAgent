@@ -1,4 +1,4 @@
-import numpy as np
+
 
 from mazesolveragent.algorithms.AStar import AStar
 from mazesolveragent.algorithms.IDA import IDA
@@ -39,6 +39,7 @@ class Agent:
     def solve(self):
         res = self._algorithm.solve(self._maze, self._mazeSize, self._entrypoint, self._destination)
         if res is not None:
-            print(res)
+            print(res[0])
+            print("sum of path", res[1])
         else:
             print(None)

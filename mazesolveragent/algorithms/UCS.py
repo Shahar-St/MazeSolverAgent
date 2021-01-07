@@ -4,11 +4,9 @@ import sys
 
 from mazesolveragent.algorithms import Constants
 from mazesolveragent.algorithms.Algorithm import Algorithm
-import numpy as np
 
 
 class UCS(Algorithm):
-
 
     class Node:
         def __init__(self, point):
@@ -41,7 +39,7 @@ class UCS(Algorithm):
 
             # check if reached goal
             if currentNode.coordinates == destination:
-                return currentNode.path
+                return currentNode.path, currentNode.cost
 
             # list of Nodes
             neighbors = self.getNeighborsNode(maze, mazeSize, currentNode)
