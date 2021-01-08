@@ -13,6 +13,7 @@ class Algorithm:
 
     @abstractmethod
     def solve(self):
+        # return path, weight
         raise NotImplementedError
 
     def isValid(self, x, y, newX, newY):
