@@ -15,16 +15,16 @@ class AStar(Algorithm):
         # a helper matrix where mazeIndicator[i][j] == shortest path to maze[i][j]
         self.mazeIndicator = np.full((self.mazeSize, self.mazeSize), np.inf)
         self.mazeIndicator[self.entryPoint[X]][self.entryPoint[Y]] = 0
-        self.h = H1(maze, mazeSize, entryPoint, destination)
+        self.H = H1(maze, mazeSize, entryPoint, destination)
 
     # an object that defines the node
     class Node:
-        def __init__(self, entryPoint, h):
+        def __init__(self, entryPoint, H):
             self.cost = 0
             self.coordinates = entryPoint
             # list that saves the path: i.e: ['RU' ,'LU', ... ]
             self.path = []
-            self.h = h
+            self.h = H.h
 
         def addStep(self, newPoint, costToNewPoint, path):
             # logic of path
@@ -39,7 +39,7 @@ class AStar(Algorithm):
     def solve(self):
         # init heap and insert entry point
         heap = []
-        entry = AStar.Node(self.entryPoint, self.h)
+        entry = AStar.Node(self.entryPoint, self.H)
         heapq.heappush(heap, entry)
 
         while len(heap) != 0:
