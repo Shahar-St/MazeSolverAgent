@@ -4,7 +4,7 @@ import copy
 
 from mazesolveragent.algorithms.Constants import X, Y
 from mazesolveragent.algorithms.Algorithm import Algorithm
-from mazesolveragent.algorithms.Hu.H1 import H1
+from mazesolveragent.algorithms.Heuristics.EuclideanDistance import EuclideanDistance
 
 
 class AStar(Algorithm):
@@ -15,16 +15,16 @@ class AStar(Algorithm):
         # a helper matrix where mazeIndicator[i][j] == shortest path to maze[i][j]
         self.mazeIndicator = np.full((self.mazeSize, self.mazeSize), np.inf)
         self.mazeIndicator[self.entryPoint[X]][self.entryPoint[Y]] = 0
-        self.H = H1(maze, mazeSize, entryPoint, destination)
+        self.heuristic = EuclideanDistance(maze, mazeSize, entryPoint, destination)
 
     # an object that defines the node
     class Node:
-        def __init__(self, entryPoint, H):
+        def __init__(self, entryPoint, heuristic):
             self.cost = 0
             self.coordinates = entryPoint
             # list that saves the path: i.e: ['RU' ,'LU', ... ]
             self.path = []
-            self.h = H.h
+            self.heuristic = heuristic.calculateH
 
         def addStep(self, newPoint, costToNewPoint, path):
             # logic of path
@@ -34,12 +34,12 @@ class AStar(Algorithm):
 
         # how the nodes will be ordered in the heap
         def __lt__(self, other):
-            return self.cost + self.h(self) < other.cost + self.h(other)
+            return self.cost + self.heuristic(self) < other.cost + self.heuristic(other)
 
     def solve(self):
         # init heap and insert entry point
         heap = []
-        entry = AStar.Node(self.entryPoint, self.H)
+        entry = AStar.Node(self.entryPoint, self.heuristic)
         heapq.heappush(heap, entry)
 
         while len(heap) != 0:

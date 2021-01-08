@@ -1,7 +1,7 @@
 from abc import abstractmethod
 
 
-class H:
+class Heuristic:
 
     def __init__(self, maze, mazeSize, entryPoint, destination):
         self.maze = maze
@@ -10,5 +10,5 @@ class H:
         self.destination = destination
 
     @abstractmethod
-    def h(self, node):
+    def calculateH(self, node):
         raise NotImplementedError

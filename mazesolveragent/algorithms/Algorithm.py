@@ -1,9 +1,10 @@
 from abc import abstractmethod
+import numpy as np
 import importlib
 
 
 class Algorithm:
-    PATHS = ['LU', 'U', 'RU', 'L', None, 'R', 'LD', 'D', 'RD']
+    PATHS = np.array(['LU', 'U', 'RU', 'L', None, 'R', 'LD', 'D', 'RD'])
 
     def __init__(self, maze, mazeSize, entryPoint, destination):
         self.mazeSize = mazeSize
