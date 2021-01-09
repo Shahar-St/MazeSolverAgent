@@ -2,9 +2,9 @@ import numpy as np
 import heapq
 import copy
 
-from mazesolveragent.algorithms.Constants import X, Y
 from mazesolveragent.algorithms.Algorithm import Algorithm
 from mazesolveragent.algorithms.Heuristics.EuclideanDistance import EuclideanDistance
+from mazesolveragent.algorithms.Util.Constants import X, Y
 
 
 class BIASTAR(Algorithm):
@@ -13,11 +13,11 @@ class BIASTAR(Algorithm):
         super().__init__(maze, mazeSize, entryPoint, destination)
 
         # a helper matrix where mazeIndicator[i][j] == shortest path to maze[i][j]
-        self.mazeIndicator = np.full((self.mazeSize, self.mazeSize), np.inf)
-        self.mazeIndicator[self.entryPoint[X]][self.entryPoint[Y]] = 0
+        self.mazeIndicator = np.full((self._mazeSize, self._mazeSize), np.inf)
+        self.mazeIndicator[self._entryPoint[X]][self._entryPoint[Y]] = 0
 
-        self.mazeIndicatorBack = np.full((self.mazeSize, self.mazeSize), np.inf)
-        self.mazeIndicatorBack[self.destination[X]][self.destination[Y]] = 0
+        self.mazeIndicatorBack = np.full((self._mazeSize, self._mazeSize), np.inf)
+        self.mazeIndicatorBack[self._destination[X]][self._destination[Y]] = 0
 
         self.heuristic = EuclideanDistance(maze, mazeSize, entryPoint, destination)
         self.heuristicBack = EuclideanDistance(maze, mazeSize, destination, entryPoint)
@@ -54,9 +54,9 @@ class BIASTAR(Algorithm):
         # init heap and insert entry point
         heap = []
         heapBack = []
-        entry = BIASTAR.Node(self.entryPoint, self.heuristic)
+        entry = BIASTAR.Node(self._entryPoint, self.heuristic)
         heapq.heappush(heap, entry)
-        entryBack = BIASTAR.Node(self.destination, self.heuristicBack)
+        entryBack = BIASTAR.Node(self._destination, self.heuristicBack)
         heapq.heappush(heapBack, entryBack)
 
         hashTable = set()
@@ -130,28 +130,3 @@ class BIASTAR(Algorithm):
                     heapq.heappush(heapBack, neigh)
 
         return None, None
-
-    def getNeighborsNode(self, currentNode):
-
-        x = currentNode.coordinates[X]
-        y = currentNode.coordinates[Y]
-
-        neighbors = []
-        pathIndex = 0
-
-        # loop to iterate around the current node
-        i = x - 1
-        j = y - 1
-        while i < x + 2:
-            if self.isValid(x, y, i, j):
-                newNeighbor = copy.deepcopy(currentNode)
-                newNeighbor.addStep([i, j], self.maze[i][j], self.PATHS[pathIndex])
-                neighbors.append(newNeighbor)
-            j += 1
-            if j == y + 2:
-                i += 1
-                j = y - 1
-            pathIndex += 1
-
-        neighbors = np.array(neighbors)
-        return neighbors
