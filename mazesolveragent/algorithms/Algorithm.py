@@ -3,7 +3,7 @@ from abc import abstractmethod
 import numpy as np
 import importlib
 
-from mazesolveragent.algorithms.Constants import X, Y
+from mazesolveragent.algorithms.Util.Constants import X, Y
 
 
 class Algorithm:

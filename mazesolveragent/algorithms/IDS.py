@@ -1,6 +1,6 @@
 import numpy as np
 
-from mazesolveragent.algorithms.Constants import X, Y
+from mazesolveragent.algorithms.Util.Constants import X, Y
 from mazesolveragent.algorithms.Algorithm import Algorithm
 
 

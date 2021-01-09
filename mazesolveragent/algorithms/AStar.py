@@ -1,9 +1,9 @@
 import numpy as np
 import heapq
 
-from mazesolveragent.algorithms.Constants import X, Y
+from mazesolveragent.algorithms.Util.Constants import X, Y
 from mazesolveragent.algorithms.Algorithm import Algorithm
-from mazesolveragent.algorithms.Node import Node
+from mazesolveragent.algorithms.Util.Node import Node
 
 
 class AStar(Algorithm):

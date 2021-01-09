@@ -1,8 +1,8 @@
 import numpy as np
 from math import ceil
 from mazesolveragent.algorithms.Algorithm import Algorithm
-from mazesolveragent.algorithms.Constants import X, Y
-from mazesolveragent.algorithms.Node import Node
+from mazesolveragent.algorithms.Util.Constants import X, Y
+from mazesolveragent.algorithms.Util.Node import Node
 
 
 class IDAStar(Algorithm):

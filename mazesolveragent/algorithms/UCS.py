@@ -1,6 +1,6 @@
 from mazesolveragent.algorithms.AStar import AStar
 from mazesolveragent.algorithms.Algorithm import Algorithm
-from mazesolveragent.algorithms.Node import Node
+from mazesolveragent.algorithms.Util.Node import Node
 
 
 class UCS(Algorithm):
