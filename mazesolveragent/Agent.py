@@ -25,13 +25,13 @@ class Agent:
         self._algorithm = Algorithm.factory(algorithmName, maze, matrixSize, entryPoint, destination)
 
     def solve(self):
-
-        path, cost = self._algorithm.solve()
-        if path is not None:
-            print(path)
-            print("sum of path", cost)
-        else:
-            print(None)
+        print(self._algorithm.solve())
+        # path, cost = self._algorithm.solve()
+        # if path is not None:
+        #     print(path)
+        #     print("sum of path", cost)
+        # else:
+        #     print(None)
 
 
 

@@ -1,6 +1,9 @@
+import copy
 from abc import abstractmethod
 import numpy as np
 import importlib
+
+from mazesolveragent.algorithms.Constants import X, Y
 
 
 class Algorithm:
@@ -26,3 +29,28 @@ class Algorithm:
         module = importlib.import_module('mazesolveragent.algorithms.' + algoName)
         algo = getattr(module, algoName)
         return algo(maze, mazeSize, entryPoint, destination)
+
+    def getNeighborsNode(self, currentNode):
+
+        x = currentNode.coordinates[X]
+        y = currentNode.coordinates[Y]
+
+        neighbors = []
+        pathIndex = 0
+
+        # loop to iterate around the current node
+        i = x - 1
+        j = y - 1
+        while i < x + 2:
+            if self.isValid(x, y, i, j):
+                newNeighbor = copy.deepcopy(currentNode)
+                newNeighbor.addStep((i, j), self.maze[i][j], self.PATHS[pathIndex])
+                neighbors.append(newNeighbor)
+            j += 1
+            if j == y + 2:
+                i += 1
+                j = y - 1
+            pathIndex += 1
+
+        neighbors = np.array(neighbors)
+        return neighbors
