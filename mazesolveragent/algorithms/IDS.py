@@ -8,8 +8,8 @@ class IDS(Algorithm):
 
     def __init__(self, maze, mazeSize, entryPoint, destination):
         super().__init__(maze, mazeSize, entryPoint, destination)
-        # distanceMatrix[i][j] = maximum number of left steps when we reached maze[i][j] (in some iteration)
-        self.distanceMatrix = np.full((self.mazeSize, self.mazeSize), -1)
+        # distanceHash[(i, j)] = maximum number of left steps when we reached maze[i][j] (in some iteration)
+        self.distanceHash = {}
 
     def solve(self):
 
@@ -46,7 +46,7 @@ class IDS(Algorithm):
         x = currentPoint[X]
         y = currentPoint[Y]
 
-        self.distanceMatrix[x][y] = leftSteps
+        self.distanceHash[(x, y)] = leftSteps
         pathCounter = 0
 
         # go around the current node
@@ -82,10 +82,10 @@ class IDS(Algorithm):
 
         # this function uses the distance matrix to make sure we need to expand this node.
         # There are 2 cases this method will return false:
-        # 1) distanceMatrix[pointToCheck] >= leftSteps - 1 :: this means we already visited this point and had more
+        # 1) distanceHash[pointToCheck] >= leftSteps - 1 :: this means we already visited this point and had more
         #       or equal steps left. This means we don't need to check this point
         # 2) If the first condition didn't happen,
-        #       we check if distanceMatrix[one of pointToCheck's neighbor] > leftSteps - 1 :: this means that
+        #       we check if distanceHash[one of pointToCheck's neighbor] > leftSteps - 1 :: this means that
         #       although we didn't visit this point with more steps yet, we will! So we can leave this point for now,
         #       we'll get to it through one of it's other neighbors with more steps.
         x = pointToCheck[X]
@@ -94,12 +94,17 @@ class IDS(Algorithm):
         currX = currentPoint[X]
         currY = currentPoint[Y]
 
+        # check case 1
+        if (x, y) in self.distanceHash and self.distanceHash[(x, y)] >= leftSteps - 1:
+            return False
+
+        # check case 2
         needed = True
         i = x - 1
         j = y - 1
         while i < x + 2 and needed:
-            if self.isValid(x, y, i, j) and (i != currX or j != currY) and \
-                    (self.distanceMatrix[x][y] >= leftSteps - 1 or self.distanceMatrix[i][j] > leftSteps - 1):
+            if self.isValid(x, y, i, j) and (i != currX or j != currY) and (i, j) in self.distanceHash and \
+                    self.distanceHash[(i, j)] > leftSteps - 1:
                 needed = False
             j += 1
             if j == y + 2:
