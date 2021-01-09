@@ -11,6 +11,7 @@ class Node:
         EuclideanDistance = 1
 
     def __init__(self, entryPoint, destination=None, heuristic=Heuristic.Zero):
+
         self._cost = 0
         self._coordinates = entryPoint
         # list that saves the path: i.e: ['RU' ,'LU', ... ]

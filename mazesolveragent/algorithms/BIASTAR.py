@@ -28,6 +28,7 @@ class BIASTAR(Algorithm):
         heapq.heappush(backwardHeap, backwardEntry)
 
         commonHash = {}
+        backwardHash = {}
 
         while len(forwardHeap) != 0 and len(backwardHeap) != 0:
 
@@ -35,8 +36,8 @@ class BIASTAR(Algorithm):
             forwardX = currentForwardNode.getCoordinates()[X]
             forwardY = currentForwardNode.getCoordinates()[Y]
 
-            if (forwardX, forwardY) in commonHash:
-                print("forward: ", currentForwardNode.coordinates)
+            if (forwardX, forwardY) in backwardHash:
+                print("forward: ", currentForwardNode.getCoordinates())
                 other = commonHash[forwardX, forwardY]
                 minCost = currentForwardNode.getCost() + other.getCost()
                 # set1 = set(forwardHeap)
@@ -50,7 +51,7 @@ class BIASTAR(Algorithm):
                 #     node2 = [x for x in backwardsHeap if x.coordinates == coordinates][0]
                 #     if node1.cost + node2.cost < minCost:
                 #         minCost = node1.cost + node2.cost
-                        # minPath = np.concatenate(node1.path, np.flip(node2.path))
+                # minPath = np.concatenate(node1.path, np.flip(node2.path))
 
                 return currentForwardNode.path, minCost
 
@@ -82,21 +83,28 @@ class BIASTAR(Algorithm):
                 return currentForwardNode.path, minCost
 
             print("insert backward to hash", currentBackwardNode.getCoordinates())
-            commonHash[(backwardX, backwardY)] = currentBackwardNode
-
+            backwardHash[(backwardX, backwardY)] = currentBackwardNode
 
             # a list of the node's neighbors
             forwardNeighbors = self.getNeighborsNode(currentForwardNode)
             backwardNeighbors = self.getNeighborsNode(currentBackwardNode)
 
             for neigh in forwardNeighbors:
-                if neigh.getCost() < self.mazeIndicator[neigh.getCoordinates()[X]][neigh.getCoordinates()[Y]]:
-                    self.mazeIndicator[neigh.getCoordinates()[X]][neigh.getCoordinates()[Y]] = neigh.getCost()
+                neighX = neigh.getCoordinates()[X]
+                neighY = neigh.getCoordinates()[Y]
+                if neigh.getCost() < self.mazeIndicator[neighX][neighY]:
+                    self.mazeIndicator[neighX][neighY] = neigh.getCost()
+                    # if (neighX, neighY) in commonHash:
+                    #     commonHash.pop((neighX, neighY))
                     heapq.heappush(forwardHeap, neigh)
 
             for neigh in backwardNeighbors:
-                if neigh.getCost() < self.mazeIndicatorBack[neigh.getCoordinates()[X]][neigh.getCoordinates()[Y]]:
-                    self.mazeIndicatorBack[neigh.getCoordinates()[X]][neigh.getCoordinates()[Y]] = neigh.getCost()
+                neighX = neigh.getCoordinates()[X]
+                neighY = neigh.getCoordinates()[Y]
+                if neigh.getCost() < self.mazeIndicatorBack[neighX][neighY]:
+                    self.mazeIndicatorBack[neighX][neighY] = neigh.getCost()
+                    # if (neighX, neighY) in commonHash:
+                    #     commonHash.pop((neighX, neighY))
                     heapq.heappush(backwardHeap, neigh)
 
         return None, None
