@@ -10,19 +10,15 @@ class Algorithm:
     PATHS = np.array(['LU', 'U', 'RU', 'L', None, 'R', 'LD', 'D', 'RD'])
 
     def __init__(self, maze, mazeSize, entryPoint, destination):
-        self.mazeSize = mazeSize
-        self.maze = maze
-        self.entryPoint = entryPoint
-        self.destination = destination
+        self._mazeSize = mazeSize
+        self._maze = maze
+        self._entryPoint = entryPoint
+        self._destination = destination
 
     @abstractmethod
     def solve(self):
         # return path, weight
         raise NotImplementedError
-
-    def isValid(self, x, y, newX, newY):
-        return 0 <= newX <= self.mazeSize - 1 and 0 <= newY <= self.mazeSize - 1 and (newX != x or newY != y) and \
-               self.maze[newX][newY] != -1
 
     @staticmethod
     def factory(algoName, maze, mazeSize, entryPoint, destination):
@@ -30,10 +26,14 @@ class Algorithm:
         algo = getattr(module, algoName)
         return algo(maze, mazeSize, entryPoint, destination)
 
+    def isValid(self, x, y, newX, newY):
+        return 0 <= newX <= self._mazeSize - 1 and 0 <= newY <= self._mazeSize - 1 and (newX != x or newY != y) and \
+               self._maze[newX][newY] != -1
+
     def getNeighborsNode(self, currentNode):
 
-        x = currentNode.coordinates[X]
-        y = currentNode.coordinates[Y]
+        x = currentNode.getCoordinates()[X]
+        y = currentNode.getCoordinates()[Y]
 
         neighbors = []
         pathIndex = 0
@@ -44,7 +44,7 @@ class Algorithm:
         while i < x + 2:
             if self.isValid(x, y, i, j):
                 newNeighbor = copy.deepcopy(currentNode)
-                newNeighbor.addStep((i, j), self.maze[i][j], self.PATHS[pathIndex])
+                newNeighbor.addStep((i, j), self._maze[i][j], self.PATHS[pathIndex])
                 neighbors.append(newNeighbor)
             j += 1
             if j == y + 2:

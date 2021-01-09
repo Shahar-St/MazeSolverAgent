@@ -17,15 +17,15 @@ class IDS(Algorithm):
         weight = 0
 
         # edge case, entry == destination
-        if np.array_equal(self.entryPoint, self.destination):
+        if np.array_equal(self._entryPoint, self._destination):
             return 'No moves needed', weight
 
-        currentPath = np.array([None for _ in range(self.mazeSize ** 2)], dtype=str)
+        currentPath = np.array([None for _ in range(self._mazeSize ** 2)], dtype=str)
 
         # call DLS with an increasing maximum depth
         depthCounter = 1
-        while path is None and depthCounter <= self.mazeSize ** 2:
-            path, weight = self.recursiveDLS(self.entryPoint, currentPath, 0, depthCounter)
+        while path is None and depthCounter <= self._mazeSize ** 2:
+            path, weight = self.recursiveDLS(self._entryPoint, currentPath, 0, depthCounter)
             depthCounter += 1
 
         # if we found a solution, return it
@@ -59,7 +59,7 @@ class IDS(Algorithm):
                 path[currentPathIndex] = self.PATHS[pathCounter]
                 newPoint = (i, j)
                 # check if we reached the goal
-                if np.array_equal(newPoint, self.destination):
+                if np.array_equal(newPoint, self._destination):
                     path[currentPathIndex + 1] = None
                     return path, None
                 # call recursively with the neighbor

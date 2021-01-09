@@ -12,14 +12,14 @@ class IDAStar(Algorithm):
         self.leftCostHash = {}
 
     def solve(self):
-        root = Node(self.entryPoint, self.destination, Node.Heuristic.EuclideanDistance)
+        root = Node(self._entryPoint, self._destination, Node.Heuristic.EuclideanDistance)
 
         fLimit = root.getH()
 
         while fLimit != np.inf:
             solution, fLimit = self.idaStarRecur(root, ceil(fLimit), np.inf)
             if solution is not None:
-                return solution.path, None
+                return solution.getPath(), None
 
         return None
 
@@ -28,10 +28,10 @@ class IDAStar(Algorithm):
         if node.getF() > fLimit:
             return None, node.getF()
 
-        if np.array_equal(node.coordinates, self.destination):
+        if np.array_equal(node.getCoordinates(), self._destination):
             return node, fLimit
 
-        self.leftCostHash[(node.coordinates[X], node.coordinates[Y])] = fLimit - node.getF()
+        self.leftCostHash[(node.getCoordinates()[X], node.getCoordinates()[Y])] = fLimit - node.getF()
 
         neighbors = self.getNeighborsNode(node)
         for n in neighbors:
@@ -46,10 +46,11 @@ class IDAStar(Algorithm):
 
     def isNeeded(self, currentNode, nodeToCheck, fLimit):
 
-        pointToCheck = nodeToCheck.coordinates
+        pointToCheck = nodeToCheck.getCoordinates()
         x = pointToCheck[X]
         y = pointToCheck[Y]
-        if (x, y) in self.leftCostHash and fLimit - (currentNode.cost + self.maze[x][y] + nodeToCheck.getH()) <= self.leftCostHash[(x, y)]:
+        if (x, y) in self.leftCostHash and fLimit - (currentNode.getCost() + self._maze[x][y] + nodeToCheck.getH()) <= \
+                self.leftCostHash[(x, y)]:
             return False
 
         return True
