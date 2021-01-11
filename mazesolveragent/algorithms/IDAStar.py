@@ -36,7 +36,6 @@ class IDAStar(Algorithm):
         neighbors = self.getNeighborsNode(node)
         for n in neighbors:
             if self.isNeeded(node, n, fLimit):
-
                 solution, newF = self.idaStarRecur(n, fLimit, nextF)
                 if solution is not None:
                     return solution, fLimit

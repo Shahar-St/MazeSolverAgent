@@ -2,9 +2,6 @@ import numpy as np
 from scipy.spatial import distance
 import enum
 
-from mazesolveragent.algorithms.Util.Constants import X, Y
-
-
 class Node:
     class Heuristic(enum.Enum):
         Zero = 0
@@ -32,15 +29,6 @@ class Node:
 
         # tie breaking according to h
         return self.getH() < other.getH()
-
-    # def __hash__(self):
-    #     return hash((self._coordinates[X], self._coordinates[Y]))
-    #
-    # def __eq__(self, other):
-    #     return (self._coordinates[X], self._coordinates[Y]) == (other.coordinates[X], other.coordinates[Y])
-    #
-    # def __ne__(self, other):
-    #     return not (self._coordinates[X], self._coordinates[Y]) == (other.coordinates[X], other.coordinates[Y])
 
     def getF(self):
         return self._cost + self.getH()

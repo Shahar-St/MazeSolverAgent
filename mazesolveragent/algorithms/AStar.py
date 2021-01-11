@@ -28,12 +28,15 @@ class AStar(Algorithm):
             if np.array_equal(currentNode.getCoordinates(), self._destination):
                 return currentNode.getPath(), currentNode.getCost()
 
-            # a list of the node's neighbors
-            neighbors = self.getNeighborsNode(currentNode)
-
-            for neigh in neighbors:
-                if neigh.getCost() < self.mazeIndicator[neigh.getCoordinates()[X]][neigh.getCoordinates()[Y]]:
-                    self.mazeIndicator[neigh.getCoordinates()[X]][neigh.getCoordinates()[Y]] = neigh.getCost()
-                    heapq.heappush(heap, neigh)
+            self.addNeighborsToHeap(currentNode, heap)
 
         return None, None
+
+    def addNeighborsToHeap(self, currentNode, heap):
+        # a list of the node's neighbors
+        neighbors = self.getNeighborsNode(currentNode)
+
+        for neigh in neighbors:
+            if neigh.getCost() < self.mazeIndicator[neigh.getCoordinates()[X]][neigh.getCoordinates()[Y]]:
+                self.mazeIndicator[neigh.getCoordinates()[X]][neigh.getCoordinates()[Y]] = neigh.getCost()
+                heapq.heappush(heap, neigh)

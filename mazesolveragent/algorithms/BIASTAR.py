@@ -1,4 +1,3 @@
-import numpy as np
 import heapq
 
 from mazesolveragent.algorithms.Algorithm import Algorithm
@@ -11,100 +10,88 @@ class BIASTAR(Algorithm):
     def __init__(self, maze, mazeSize, entryPoint, destination):
         super().__init__(maze, mazeSize, entryPoint, destination)
 
-        # a helper matrix where mazeIndicator[i][j] == shortest path to maze[i][j]
-        self.mazeIndicator = np.full((self._mazeSize, self._mazeSize), np.inf)
-        self.mazeIndicator[self._entryPoint[X]][self._entryPoint[Y]] = 0
+        # visited lists
+        self._forwardHash = {}
+        self._backwardHash = {}
 
-        self.mazeIndicatorBack = np.full((self._mazeSize, self._mazeSize), np.inf)
-        self.mazeIndicatorBack[self._destination[X]][self._destination[Y]] = 0
+        # <direction>HelperHash[(i, j)] = shortest (least expensive) path (in form of a Node type) to maze[i][j]
+        # in <direction> (that was found in any time)
+        self._forwardHelperHash = {}
+        self._backwardHelperHash = {}
 
     def solve(self):
-        # init heaps and insert forwardEntry points
-        forwardHeap = []
-        backwardHeap = []
-        forwardEntry = Node(self._entryPoint, self._destination, heuristic=Node.Heuristic.EuclideanDistance)
-        heapq.heappush(forwardHeap, forwardEntry)
-        backwardEntry = Node(self._destination, self._entryPoint, heuristic=Node.Heuristic.EuclideanDistance)
-        heapq.heappush(backwardHeap, backwardEntry)
 
-        commonHash = {}
-        backwardHash = {}
+        # init heaps and insert entry points
+        forwardEntry = Node(self._entryPoint, self._destination, heuristic=Node.Heuristic.EuclideanDistance)
+        forwardHeap = [forwardEntry]
+
+        backwardEntry = Node(self._destination, self._entryPoint, heuristic=Node.Heuristic.EuclideanDistance)
+        backwardHeap = [backwardEntry]
+
+        # init helper hashes
+        self._forwardHelperHash[(self._entryPoint[X], self._entryPoint[Y])] = forwardEntry
+        self._backwardHelperHash[(self._destination[X], self._destination[Y])] = backwardEntry
 
         while len(forwardHeap) != 0 and len(backwardHeap) != 0:
 
+            # forward
+            # pop minimum
             currentForwardNode = heapq.heappop(forwardHeap)
-            forwardX = currentForwardNode.getCoordinates()[X]
-            forwardY = currentForwardNode.getCoordinates()[Y]
+            forwardCoords = (currentForwardNode.getCoordinates()[X], currentForwardNode.getCoordinates()[Y])
 
-            if (forwardX, forwardY) in backwardHash:
-                print("forward: ", currentForwardNode.getCoordinates())
-                other = commonHash[forwardX, forwardY]
-                minCost = currentForwardNode.getCost() + other.getCost()
-                # set1 = set(forwardHeap)
-                # set2 = set(backwardsHeap)
-                # intersection = set1.intersection(set2)
-                #
-                # minPath = None
-                # for inter in intersection:
-                #     coordinates = inter.coordinates
-                #     node1 = [x for x in forwardHeap if x.coordinates == coordinates][0]
-                #     node2 = [x for x in backwardsHeap if x.coordinates == coordinates][0]
-                #     if node1.cost + node2.cost < minCost:
-                #         minCost = node1.cost + node2.cost
-                # minPath = np.concatenate(node1.path, np.flip(node2.path))
+            # check for a solution
+            if forwardCoords in self._backwardHash:
+                minPath, minCost = self.lookForOtherSolutions(currentForwardNode, forwardCoords, self._backwardHash)
+                return minPath, minCost + self.getCostOfPoint(self._destination)
 
-                return currentForwardNode.path, minCost
+            # insert to visited list
+            self._forwardHash[forwardCoords] = currentForwardNode
 
-            print("insert forward to hash", currentForwardNode.getCoordinates())
-            commonHash[(forwardX, forwardY)] = currentForwardNode
-
+            # backward (same logic as forward)
             currentBackwardNode = heapq.heappop(backwardHeap)
-            backwardX = currentBackwardNode.getCoordinates()[X]
-            backwardY = currentBackwardNode.getCoordinates()[Y]
+            backwardCoords = (currentBackwardNode.getCoordinates()[X], currentBackwardNode.getCoordinates()[Y])
 
-            if (backwardX, backwardY) in commonHash:
-                other = commonHash[backwardX, backwardY]
-                minCost = currentBackwardNode.getCost() + other.getCost()
+            if backwardCoords in self._forwardHash:
+                minPath, minCost = self.lookForOtherSolutions(currentBackwardNode, backwardCoords, self._forwardHash)
+                return minPath, minCost + self.getCostOfPoint(self._destination)
 
-                backwardHeap.append(currentBackwardNode)
-                print("backward: ", currentBackwardNode.coordinates)
-                set1 = set(forwardHeap)
-                set2 = set(backwardHeap)
-                intersection = set1.intersection(set2)
-                minPath = None
-                for inter in intersection:
-                    coordinates = inter.coordinates
-                    node1 = [x for x in forwardHeap if x.coordinates == coordinates][0]
-                    node2 = [x for x in backwardHeap if x.coordinates == coordinates][0]
-                    if node1.cost + node2.cost < minCost:
-                        minCost = node1.cost + node2.cost
-                        # minPath = np.concatenate(node1.path, np.flip(node2.path))
+            self._backwardHash[backwardCoords] = currentBackwardNode
 
-                return currentForwardNode.path, minCost
-
-            print("insert backward to hash", currentBackwardNode.getCoordinates())
-            backwardHash[(backwardX, backwardY)] = currentBackwardNode
-
-            # a list of the node's neighbors
-            forwardNeighbors = self.getNeighborsNode(currentForwardNode)
-            backwardNeighbors = self.getNeighborsNode(currentBackwardNode)
-
-            for neigh in forwardNeighbors:
-                neighX = neigh.getCoordinates()[X]
-                neighY = neigh.getCoordinates()[Y]
-                if neigh.getCost() < self.mazeIndicator[neighX][neighY]:
-                    self.mazeIndicator[neighX][neighY] = neigh.getCost()
-                    # if (neighX, neighY) in commonHash:
-                    #     commonHash.pop((neighX, neighY))
-                    heapq.heappush(forwardHeap, neigh)
-
-            for neigh in backwardNeighbors:
-                neighX = neigh.getCoordinates()[X]
-                neighY = neigh.getCoordinates()[Y]
-                if neigh.getCost() < self.mazeIndicatorBack[neighX][neighY]:
-                    self.mazeIndicatorBack[neighX][neighY] = neigh.getCost()
-                    # if (neighX, neighY) in commonHash:
-                    #     commonHash.pop((neighX, neighY))
-                    heapq.heappush(backwardHeap, neigh)
+            # expand successors
+            self.expandNeighbors(currentForwardNode, forwardHeap, self._forwardHelperHash)
+            self.expandNeighbors(currentBackwardNode, backwardHeap, self._backwardHelperHash)
 
         return None, None
+
+    def expandNeighbors(self, currentNode, heap, helperHash):
+
+        # a list of the node's neighbors
+        neighbors = self.getNeighborsNode(currentNode)
+
+        for neigh in neighbors:
+            coords = (neigh.getCoordinates()[X], neigh.getCoordinates()[Y])
+            # this if help us avoid expanding circles and maintains the helperHash definition
+            if coords not in helperHash or neigh.getCost() < helperHash[coords].getCost():
+                heapq.heappush(heap, neigh)
+                helperHash[coords] = neigh
+
+    def lookForOtherSolutions(self, foundNode, foundNodeCoords, otherHash):
+
+        # our first found matching point
+        matchingNode = otherHash[foundNodeCoords]
+        minCost = foundNode.getCost() + matchingNode.getCost() - self.getCostOfPoint(matchingNode.getCoordinates())
+        minPath = None  # TODO
+
+        # get intersection of helper hashes. This guarantees to get all (and best) possible solutions,
+        # derives from the helper hashes definition
+        intersection = self._forwardHelperHash.keys() & self._backwardHelperHash.keys()
+
+        # check all possible solution and pick the least expansive one
+        for coordinates in intersection:
+            cost = self._forwardHelperHash[coordinates].getCost() + self._backwardHelperHash[coordinates].getCost() \
+                   - self.getCostOfPoint(coordinates)
+            if cost < minCost:
+                minCost = cost
+                minPath = None  # TODO
+
+        return minPath, minCost

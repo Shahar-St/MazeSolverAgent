@@ -54,3 +54,6 @@ class Algorithm:
 
         neighbors = np.array(neighbors)
         return neighbors
+
+    def getCostOfPoint(self, point):
+        return self._maze[point[X]][point[Y]]
