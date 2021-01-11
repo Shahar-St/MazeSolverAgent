@@ -7,8 +7,8 @@ from mazesolveragent.algorithms.Util.Node import Node
 
 class BIASTAR(Algorithm):
 
-    def __init__(self, maze, mazeSize, entryPoint, destination):
-        super().__init__(maze, mazeSize, entryPoint, destination)
+    def __init__(self, maze, mazeSize, entryPoint, destination, startTime, timeLimit):
+        super().__init__(maze, mazeSize, entryPoint, destination, startTime, timeLimit)
 
         # visited lists
         self._forwardHash = {}
@@ -42,7 +42,7 @@ class BIASTAR(Algorithm):
             # check for a solution
             if forwardCoords in self._backwardHash:
                 minPath, minCost = self.lookForOtherSolutions(currentForwardNode, forwardCoords, self._backwardHash)
-                return minPath, minCost + self.getCostOfPoint(self._destination)
+                return minPath, minCost + self.getCostOfPoint(self._destination), self._numOfExpandedNodes
 
             # insert to visited list
             self._forwardHash[forwardCoords] = currentForwardNode
@@ -52,21 +52,22 @@ class BIASTAR(Algorithm):
             backwardCoords = (currentBackwardNode.getCoordinates()[X], currentBackwardNode.getCoordinates()[Y])
 
             if backwardCoords in self._forwardHash:
-                minPath, minCost = self.lookForOtherSolutions(currentBackwardNode, backwardCoords, self._forwardHash)
-                return minPath, minCost + self.getCostOfPoint(self._destination)
+                minPath, minCost = self.lookForOtherSolutions(currentBackwardNode, backwardCoords, self._forwardHash,
+                                                              forwardFound=False)
+                return minPath, minCost + self.getCostOfPoint(self._destination), self._numOfExpandedNodes
 
             self._backwardHash[backwardCoords] = currentBackwardNode
 
             # expand successors
             self.expandNeighbors(currentForwardNode, forwardHeap, self._forwardHelperHash)
-            self.expandNeighbors(currentBackwardNode, backwardHeap, self._backwardHelperHash)
+            self.expandNeighbors(currentBackwardNode, backwardHeap, self._backwardHelperHash, reverse=True)
 
         return None, None
 
-    def expandNeighbors(self, currentNode, heap, helperHash):
+    def expandNeighbors(self, currentNode, heap, helperHash, reverse=False):
 
         # a list of the node's neighbors
-        neighbors = self.getNeighborsNode(currentNode)
+        neighbors = self.getNeighborsNode(currentNode, reverse)
 
         for neigh in neighbors:
             coords = (neigh.getCoordinates()[X], neigh.getCoordinates()[Y])
@@ -74,13 +75,15 @@ class BIASTAR(Algorithm):
             if coords not in helperHash or neigh.getCost() < helperHash[coords].getCost():
                 heapq.heappush(heap, neigh)
                 helperHash[coords] = neigh
+                self._numOfExpandedNodes += 1
 
-    def lookForOtherSolutions(self, foundNode, foundNodeCoords, otherHash):
+    def lookForOtherSolutions(self, foundNode, foundNodeCoords, otherHash, forwardFound=True):
 
         # our first found matching point
         matchingNode = otherHash[foundNodeCoords]
         minCost = foundNode.getCost() + matchingNode.getCost() - self.getCostOfPoint(matchingNode.getCoordinates())
-        minPath = None  # TODO
+        minPath = foundNode.getPath() + matchingNode.getPath() if forwardFound is True \
+            else matchingNode.getPath() + foundNode.getPath()
 
         # get intersection of helper hashes. This guarantees to get all (and best) possible solutions,
         # derives from the helper hashes definition
@@ -92,6 +95,7 @@ class BIASTAR(Algorithm):
                    - self.getCostOfPoint(coordinates)
             if cost < minCost:
                 minCost = cost
-                minPath = None  # TODO
+                minPath = self._forwardHelperHash[coordinates].getPath() + self._backwardHelperHash[
+                    coordinates].getPath()
 
         return minPath, minCost

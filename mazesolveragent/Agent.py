@@ -1,3 +1,5 @@
+import time
+
 import numpy as np
 
 from mazesolveragent.algorithms.Algorithm import Algorithm
@@ -6,6 +8,8 @@ from mazesolveragent.algorithms.Algorithm import Algorithm
 class Agent:
 
     def __init__(self, fileName):
+        startTime = time.time()
+
         # Parse the data
         inputFile = open(fileName, 'r')
         algorithmName = inputFile.readline().replace('\n', '')
@@ -19,19 +23,20 @@ class Agent:
             strLine = ''.join([c for c in line if c not in unwantedChars])
             maze.append([int(num) for num in strLine.split(',')])
 
+        inputFile.close()
         maze = np.array(maze)
 
+        timeLimit = 2  ####TODO
+
         # init the object fields
-        self._algorithm = Algorithm.factory(algorithmName, maze, matrixSize, entryPoint, destination)
+        self._algorithm = Algorithm.factory(algorithmName, maze, matrixSize, entryPoint, destination, startTime,
+                                            timeLimit)
+        if fileName.endswith('.txt'):
+            fileName = fileName[:len(fileName) - 4]
+        self._fileName = fileName
+        self._startTime = startTime
 
     def solve(self):
-        print(self._algorithm.solve())
-        # path, cost = self._algorithm.solve()
-        # if path is not None:
-        #     print(path)
-        #     print("sum of path", cost)
-        # else:
-        #     print(None)
 
-
-
+        actualAlg = self._algorithm.solve()
+        actualAlg.printResultsToFile(self._fileName)

@@ -5,11 +5,14 @@ from mazesolveragent.algorithms.Util.Node import Node
 
 class UCS(Algorithm):
 
-    def __init__(self, maze, mazeSize, entryPoint, destination):
-        super().__init__(maze, mazeSize, entryPoint, destination)
+    def __init__(self, maze, mazeSize, entryPoint, destination, startTime, timeLimit):
+        super().__init__(maze, mazeSize, entryPoint, destination, startTime, timeLimit)
 
-        self.aStar = AStar(maze, mazeSize, entryPoint, destination)
+        self.aStar = AStar(maze, mazeSize, entryPoint, destination, startTime, timeLimit)
 
 
     def solve(self):
-        return self.aStar.solve(heuristic=Node.Heuristic.Zero)
+        # call A* with the 0 heuristic
+        aStar = self.aStar.solve(heuristic=Node.Heuristic.Zero)
+        aStar.Solution.setAlgoName(type(self).__name__)
+        return aStar
