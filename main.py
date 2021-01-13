@@ -9,7 +9,7 @@ def printMenu(inputFile, timeLimit):
 
     print('Please choose from the following options:\n'
           '0: Exit\n'
-          f'1: Start (input file = {inputFile}, Time limit is {maxTime}).\n'
+          f'1: Start (input file = {inputFile}, Time limit = {maxTime}).\n'
           '2: Change input file.\n'
           '3: Change time limit.')
 
