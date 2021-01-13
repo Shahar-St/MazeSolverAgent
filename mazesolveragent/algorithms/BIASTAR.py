@@ -29,10 +29,10 @@ class BIASTAR(Algorithm):
             return self
 
         # init heaps and insert entry points
-        forwardEntry = Node(self._entryPoint, self._destination, heuristic=Node.Heuristic.EuclideanDistance)
+        forwardEntry = Node(self._entryPoint, self._destination, heuristic=Node.Heuristic.MaxDeltas)
         forwardHeap = [forwardEntry]
 
-        backwardEntry = Node(self._destination, self._entryPoint, heuristic=Node.Heuristic.EuclideanDistance)
+        backwardEntry = Node(self._destination, self._entryPoint, heuristic=Node.Heuristic.MaxDeltas)
         backwardHeap = [backwardEntry]
 
         # init helper hashes

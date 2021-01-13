@@ -3,7 +3,7 @@ import time
 import numpy as np
 from math import ceil
 from mazesolveragent.algorithms.Algorithm import Algorithm
-from mazesolveragent.algorithms.Util.Constants import X, Y
+from mazesolveragent.algorithms.Util.Constants import X, Y, HEURISTIC
 from mazesolveragent.algorithms.Util.Node import Node
 
 
@@ -12,7 +12,7 @@ class IDASTAR(Algorithm):
     def __init__(self, maze, mazeSize, entryPoint, destination, startTime, timeLimit):
         super().__init__(maze, mazeSize, entryPoint, destination, startTime, timeLimit)
         self.leftCostHash = {}
-        self._heuristicName = 'Euclidean Distance'
+        self._heuristicName = HEURISTIC
 
     def solve(self):
 
@@ -22,7 +22,7 @@ class IDASTAR(Algorithm):
             self._setSuccess(success=False)
             return self
 
-        root = Node(self._entryPoint, self._destination, Node.Heuristic.EuclideanDistance)
+        root = Node(self._entryPoint, self._destination, Node.Heuristic.MaxDeltas)
 
         fLimit = root.getH()
         self._sumOfHValues += root.getH()

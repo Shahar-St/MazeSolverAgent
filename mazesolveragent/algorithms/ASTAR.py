@@ -3,7 +3,7 @@ import time
 import numpy as np
 import heapq
 
-from mazesolveragent.algorithms.Util.Constants import X, Y
+from mazesolveragent.algorithms.Util.Constants import X, Y, HEURISTIC
 from mazesolveragent.algorithms.Algorithm import Algorithm
 from mazesolveragent.algorithms.Util.Node import Node
 
@@ -17,7 +17,7 @@ class ASTAR(Algorithm):
         self.mazeIndicator = np.full((self._mazeSize, self._mazeSize), np.inf)
         self.mazeIndicator[self._entryPoint[X]][self._entryPoint[Y]] = 0
 
-    def solve(self, heuristic=Node.Heuristic.EuclideanDistance):
+    def solve(self, heuristic=Node.Heuristic.MaxDeltas):
 
         # edge case - entry or destination are -1
         if self._maze[self._entryPoint[X]][self._entryPoint[Y]] == -1 or\
@@ -25,8 +25,8 @@ class ASTAR(Algorithm):
             self._setSuccess(success=False)
             return self
 
-        if heuristic == Node.Heuristic.EuclideanDistance:
-            self._heuristicName = 'Euclidean Distance'
+        if heuristic == Node.Heuristic.MaxDeltas:
+            self._heuristicName = HEURISTIC
         # init heap and insert entry point
         heap = []
         entry = Node(self._entryPoint, self._destination, heuristic)
