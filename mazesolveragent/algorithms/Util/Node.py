@@ -1,5 +1,4 @@
 import numpy as np
-from scipy.spatial import distance
 import enum
 
 from mazesolveragent.algorithms.Util.Constants import X, Y
