@@ -8,7 +8,7 @@ from mazesolveragent.algorithms.Algorithm import Algorithm
 from mazesolveragent.algorithms.Util.Node import Node
 
 
-class AStar(Algorithm):
+class ASTAR(Algorithm):
 
     def __init__(self, maze, mazeSize, entryPoint, destination, startTime, timeLimit):
         super().__init__(maze, mazeSize, entryPoint, destination, startTime, timeLimit)
@@ -18,6 +18,12 @@ class AStar(Algorithm):
         self.mazeIndicator[self._entryPoint[X]][self._entryPoint[Y]] = 0
 
     def solve(self, heuristic=Node.Heuristic.EuclideanDistance):
+
+        # edge case - entry or destination are -1
+        if self._maze[self._entryPoint[X]][self._entryPoint[Y]] == -1 or\
+                self._maze[self._destination[X]][self._destination[Y]] == -1:
+            self._setSuccess(success=False)
+            return self
 
         if heuristic == Node.Heuristic.EuclideanDistance:
             self._heuristicName = 'Euclidean Distance'
@@ -56,3 +62,5 @@ class AStar(Algorithm):
                 heapq.heappush(heap, neigh)
                 self._numOfExpandedNodes += 1
                 self._sumOfHValues += neigh.getH()
+            else:
+                self.addCutoff(len(neigh.getPath()))

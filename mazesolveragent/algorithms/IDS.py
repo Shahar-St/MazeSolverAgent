@@ -1,3 +1,5 @@
+import time
+
 import numpy as np
 
 from mazesolveragent.algorithms.Util.Constants import X, Y
@@ -13,12 +15,18 @@ class IDS(Algorithm):
 
     def solve(self):
 
+        # edge case - entry or destination are -1
+        if self._maze[self._entryPoint[X]][self._entryPoint[Y]] == -1 or\
+                self._maze[self._destination[X]][self._destination[Y]] == -1:
+            self._setSuccess(success=False)
+            return self
         path = None
-        weight = 0
 
         # edge case, entry == destination
         if np.array_equal(self._entryPoint, self._destination):
-            return 'No moves needed', weight
+            self.addCutoff(0)
+            self._setSuccess(path=['No moves needed'], cost=0, solutionDepth=0)
+            return self
 
         currentPath = np.array([None for _ in range(self._mazeSize ** 2)], dtype=str)
 
@@ -41,6 +49,10 @@ class IDS(Algorithm):
 
     def recursiveDLS(self, currentPoint, path, currentPathIndex, maxDepth):
 
+        if self._timeLimit < time.time() - self._startTime:
+            self._setSuccess(success=False)
+            return self
+
         if currentPathIndex == maxDepth:
             self.addCutoff(currentPathIndex)
             return None
@@ -58,25 +70,29 @@ class IDS(Algorithm):
         j = y - 1
         while i < x + 2:
             # check if we can and need to expand this neighbor
-            if self.isValid(x, y, i, j) and self.isNeeded(currentPoint, (i, j), leftSteps):
-                # add the neighbor's direction
-                path[currentPathIndex] = self.PATHS[pathCounter]
-                newPoint = (i, j)
-
-                self._numOfExpandedNodes += 1
-
-                # check if we reached our goal
-                if np.array_equal(newPoint, self._destination):
-                    path[currentPathIndex + 1] = None
+            if self.isValid(x, y, i, j):
+                if self._maze[i][j] == -1:
                     self.addCutoff(currentPathIndex)
-                    return path
-                # call recursively with the neighbor
-                res = self.recursiveDLS(newPoint, path, currentPathIndex + 1, maxDepth)
+                elif self.isNeeded(currentPoint, (i, j), leftSteps):
+                    # add the neighbor's direction
+                    path[currentPathIndex] = self.PATHS[pathCounter]
+                    newPoint = (i, j)
 
-                # if we have a solution, return
-                if res is not None:
-                    return path
+                    self._numOfExpandedNodes += 1
 
+                    # check if we reached our goal
+                    if np.array_equal(newPoint, self._destination):
+                        path[currentPathIndex + 1] = None
+                        self.addCutoff(currentPathIndex)
+                        return path
+                    # call recursively with the neighbor
+                    res = self.recursiveDLS(newPoint, path, currentPathIndex + 1, maxDepth)
+
+                    # if we have a solution, return
+                    if res is not None:
+                        return path
+                else:
+                    self.addCutoff(currentPathIndex)
             j += 1
             if j == y + 2:
                 i += 1

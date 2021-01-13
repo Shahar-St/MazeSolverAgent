@@ -1,13 +1,13 @@
 import time
-
 import numpy as np
+from math import log2
 
 from mazesolveragent.algorithms.Algorithm import Algorithm
 
 
 class Agent:
 
-    def __init__(self, fileName):
+    def __init__(self, fileName, timeLimit):
         startTime = time.time()
 
         # Parse the data
@@ -26,7 +26,8 @@ class Agent:
         inputFile.close()
         maze = np.array(maze)
 
-        timeLimit = 2  ####TODO
+        if timeLimit is None:
+            timeLimit = log2(matrixSize)
 
         # init the object fields
         self._algorithm = Algorithm.factory(algorithmName, maze, matrixSize, entryPoint, destination, startTime,
