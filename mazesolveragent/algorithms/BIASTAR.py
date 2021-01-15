@@ -2,7 +2,7 @@ import heapq
 import time
 
 from mazesolveragent.algorithms.Algorithm import Algorithm
-from mazesolveragent.algorithms.Util.Constants import X, Y
+from mazesolveragent.algorithms.Util.Constants import X, Y, HEURISTIC
 from mazesolveragent.algorithms.Util.Node import Node
 
 
@@ -10,6 +10,7 @@ class BIASTAR(Algorithm):
 
     def __init__(self, maze, mazeSize, entryPoint, destination, startTime, timeLimit):
         super().__init__(maze, mazeSize, entryPoint, destination, startTime, timeLimit)
+        self._heuristicName = HEURISTIC
 
         # visited lists
         self._forwardHash = {}
@@ -23,16 +24,18 @@ class BIASTAR(Algorithm):
     def solve(self):
 
         # edge case - entry or destination are -1
-        if self._maze[self._entryPoint[X]][self._entryPoint[Y]] == -1 or\
+        if self._maze[self._entryPoint[X]][self._entryPoint[Y]] == -1 or \
                 self._maze[self._destination[X]][self._destination[Y]] == -1:
             self._setSuccess(success=False)
             return self
 
         # init heaps and insert entry points
-        forwardEntry = Node(self._entryPoint, self._destination, heuristic=Node.Heuristic.MaxDeltas)
+        forwardEntry = Node(self._entryPoint, self._destination, heuristic=Node.Heuristic.EuclideanDistance)
+        self._sumOfHValues += forwardEntry.getH()
         forwardHeap = [forwardEntry]
 
-        backwardEntry = Node(self._destination, self._entryPoint, heuristic=Node.Heuristic.MaxDeltas)
+        backwardEntry = Node(self._destination, self._entryPoint, heuristic=Node.Heuristic.EuclideanDistance)
+        self._sumOfHValues += backwardEntry.getH()
         backwardHeap = [backwardEntry]
 
         # init helper hashes
@@ -52,7 +55,8 @@ class BIASTAR(Algorithm):
             if forwardCoords in self._backwardHash:
                 self.addCutoff(len(currentForwardNode.getPath()))
                 minPath, minCost = self.lookForOtherSolutions(currentForwardNode, forwardCoords, self._backwardHash)
-                return minPath, minCost + self.getCostOfPoint(self._destination), self._numOfExpandedNodes
+                self._setSuccess(minPath, minCost + self.getCostOfPoint(self._destination), len(minPath))
+                return self
 
             # insert to visited list
             self._forwardHash[forwardCoords] = currentForwardNode
@@ -65,7 +69,9 @@ class BIASTAR(Algorithm):
                 self.addCutoff(len(currentBackwardNode.getPath()))
                 minPath, minCost = self.lookForOtherSolutions(currentBackwardNode, backwardCoords, self._forwardHash,
                                                               forwardFound=False)
-                return minPath, minCost + self.getCostOfPoint(self._destination), self._numOfExpandedNodes
+
+                self._setSuccess(minPath, minCost + self.getCostOfPoint(self._destination), len(minPath))
+                return self
 
             self._backwardHash[backwardCoords] = currentBackwardNode
 
@@ -76,7 +82,8 @@ class BIASTAR(Algorithm):
             if self._timeLimit < time.time() - self._startTime:
                 timeLeft = False
 
-        return None, None
+        self._setSuccess(success=False)
+        return self
 
     def expandNeighbors(self, currentNode, heap, helperHash, reverse=False):
 
@@ -90,6 +97,7 @@ class BIASTAR(Algorithm):
                 heapq.heappush(heap, neigh)
                 helperHash[coords] = neigh
                 self._numOfExpandedNodes += 1
+                self._sumOfHValues += neigh.getH()
             else:
                 self.addCutoff(len(neigh.getPath()))
 

@@ -17,7 +17,7 @@ class Algorithm:
         self._destination = destination
         self._numOfExpandedNodes = 1
         self._sumOfHValues = 0
-        self._solution = None
+        self.solution = None
         self._sumOfCutoffs = 0
         self._numOfCutoffs = 0
         self._minCutoff = np.inf
@@ -28,7 +28,6 @@ class Algorithm:
 
     @abstractmethod
     def solve(self):
-        # return path, weight
         raise NotImplementedError
 
     @staticmethod
@@ -41,7 +40,7 @@ class Algorithm:
         return 0 <= newX <= self._mazeSize - 1 and 0 <= newY <= self._mazeSize - 1 and (newX != x or newY != y)
 
     def getNeighborsNode(self, currentNode, reverse=False):
-
+        # get the node's neighbors, check if they are valid and update the statistics
         x = currentNode.getCoordinates()[X]
         y = currentNode.getCoordinates()[Y]
 
@@ -139,7 +138,7 @@ class Algorithm:
             solutionDepth = -1
             success = False
 
-        self._solution = Algorithm.Solution(
+        self.solution = Algorithm.Solution(
             path=path,
             cost=cost,
             numOfExpandedNodes=self._numOfExpandedNodes,
@@ -157,4 +156,4 @@ class Algorithm:
         )
 
     def printResultsToFile(self, fileName):
-        self._solution.printResults(fileName, self._heuristicName)
+        self.solution.printResults(fileName, self._heuristicName)

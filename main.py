@@ -1,3 +1,5 @@
+import os
+import traceback
 from mazesolveragent.Agent import Agent
 
 
@@ -15,7 +17,8 @@ def printMenu(inputFile, timeLimit):
 
 
 def main():
-    inputFile = 'SpiralTest.txt'
+
+    inputFile = os.getcwd() + '\\SpiralTest.txt'
     maxTime = None
 
     validInput = False
@@ -30,7 +33,7 @@ def main():
                 elif inp == 1:
                     validInput = True
                 elif inp == 2:
-                    inputFile = input('Enter input path: ')
+                    inputFile = input('Enter (full) input path: ')
                 else:
                     maxTime = float(input('Enter time limit (in seconds): '))
             else:
@@ -41,10 +44,15 @@ def main():
 
         print()
 
-    print('----Starting----')
-    agent = Agent(inputFile, maxTime)
-    agent.solve()
-    print(f'----Done. Results we printed to "{inputFile} - solution.txt"----')
+    try:
+        print('----Starting----')
+        agent = Agent(inputFile, maxTime)
+        agent.solve()
+        print(f'----Done. Results we printed to "{inputFile} - solution.txt"----')
+    except Exception:
+        traceback.print_exc()
+    finally:
+        input('Press any key to return...')
 
 
 if __name__ == '__main__':

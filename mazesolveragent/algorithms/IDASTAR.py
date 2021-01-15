@@ -11,6 +11,7 @@ class IDASTAR(Algorithm):
 
     def __init__(self, maze, mazeSize, entryPoint, destination, startTime, timeLimit):
         super().__init__(maze, mazeSize, entryPoint, destination, startTime, timeLimit)
+        # leftCostHash[(i, j)] = max left F when we reached maze[i][j] (at some iteration)
         self.leftCostHash = {}
         self._heuristicName = HEURISTIC
 
@@ -22,13 +23,13 @@ class IDASTAR(Algorithm):
             self._setSuccess(success=False)
             return self
 
-        root = Node(self._entryPoint, self._destination, Node.Heuristic.MaxDeltas)
+        # init parameters
+        root = Node(self._entryPoint, self._destination, Node.Heuristic.EuclideanDistance)
 
         fLimit = root.getH()
         self._sumOfHValues += root.getH()
 
         while fLimit != np.inf:
-
             solutionNode, fLimit = self.idaStarRecur(root, ceil(fLimit), np.inf)
             if solutionNode is not None:
                 self._setSuccess(solutionNode.getPath(), solutionNode.getCost(), len(solutionNode.getPath()))
@@ -39,20 +40,24 @@ class IDASTAR(Algorithm):
 
     def idaStarRecur(self, node, fLimit, nextF):
 
+        # check if we exceeded the time limit
         if self._timeLimit < time.time() - self._startTime:
             self._setSuccess(success=False)
             return None, np.inf
 
+        # check if we exceeded the F limit
         if node.getF() > fLimit:
             self.addCutoff(len(node.getPath()))
             return None, node.getF()
 
+        # check if we reached a solution
         if np.array_equal(node.getCoordinates(), self._destination):
             self.addCutoff(len(node.getPath()))
             return node, fLimit
 
         self.leftCostHash[(node.getCoordinates()[X], node.getCoordinates()[Y])] = fLimit - node.getF()
 
+        # expand neighbors
         neighbors = self.getNeighborsNode(node)
 
         for n in neighbors:

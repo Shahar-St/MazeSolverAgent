@@ -14,5 +14,5 @@ class UCS(Algorithm):
     def solve(self):
         # call A* with the 0 heuristic
         aStar = self.aStar.solve(heuristic=Node.Heuristic.Zero)
-        aStar.Solution.setAlgoName(type(self).__name__)
+        aStar.solution.setAlgoName(type(self).__name__)
         return aStar

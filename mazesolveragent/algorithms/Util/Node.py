@@ -1,13 +1,12 @@
 import numpy as np
+from scipy.spatial import distance
 import enum
-
-from mazesolveragent.algorithms.Util.Constants import X, Y
 
 
 class Node:
     class Heuristic(enum.Enum):
         Zero = 0
-        MaxDeltas = 1
+        EuclideanDistance = 1
 
     def __init__(self, entryPoint, destination=None, heuristic=Heuristic.Zero):
 
@@ -38,15 +37,12 @@ class Node:
     def getH(self):
         if self._heuristic == self.Heuristic.Zero:
             return 0
-        if self._heuristic == self.Heuristic.MaxDeltas:
-            return self.maxDeltas()
+        if self._heuristic == self.Heuristic.EuclideanDistance:
+            return self.euclideanDistance()
         raise Exception
 
-    def maxDeltas(self):
-
-        return max(np.absolute(self.getCoordinates()[X] - self._destination[X]),
-                   np.absolute(self.getCoordinates()[Y] - self._destination[Y]))
-
+    def euclideanDistance(self):
+        return distance.euclidean(self.getCoordinates(), self._destination) / 2
 
     def getCoordinates(self):
         return self._coordinates
